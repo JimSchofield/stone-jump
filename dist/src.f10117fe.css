@@ -1,0 +1,56 @@
+html, body {
+  height: 100vh;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  color: #333;
+  font-family: Avenir;
+}
+
+.row {
+  display: flex;
+  margin: 2px 0;
+}
+
+.cell {
+  margin: 0 2px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  color: #888;
+}
+
+.cell_empty {
+  border-radius: 50%;
+  border: 2px solid #333;
+  background: #333;
+}
+
+.cell_filled {
+  border-radius: 50%;
+  border: 2px solid #333;
+  background: #3A32ED;
+}
+
+.cell_invalid {
+  border-radius: 50%;
+  border: 2px solid #333;
+  border-color: transparent;
+  background: transparent;
+}
+
+.move-list {
+  position: fixed;
+  bottom: 1em;
+  left: 1em;
+}
+
+/*# sourceMappingURL=/src.f10117fe.css.map */

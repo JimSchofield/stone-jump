@@ -1,0 +1,36 @@
+.row {
+    display: flex;
+    margin: 2px 0;
+}
+
+@mixin cellHasBorder() {
+    border-radius: 50%;
+    border: 2px solid $BLACK;
+}
+
+.cell {
+    margin: 0 2px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    color: #888;
+}
+
+.cell_empty {
+    @include cellHasBorder();
+    background: $BLACK;
+}
+
+.cell_filled {
+    @include cellHasBorder();
+    background: $BLUE;
+}
+
+.cell_invalid {
+    @include cellHasBorder();
+    border-color: transparent;
+    background: transparent;
+}
