@@ -1,6 +1,6 @@
 import _ from '../util/_';
 
-import Board, { cell } from "../models/Board";
+import Board, { Cell } from "../models/Board";
 import MoveList from '../models/MoveList';
 import Move from '../models/Move';
 
@@ -10,29 +10,45 @@ export const render = (template: (data: any) => string): (container: HTMLElement
     };
 }
 
+export const renderMyBoard = (data) => renderBoard(
+    document.querySelector('.board'),
+    data
+);
+
 export const renderBoard = render((board: Board) => {
-    function getCellClass(cell: cell): string {
-        switch (true) {
-            case cell.value === '0':
-                return 'cell cell_empty'
-                break;
-            case cell.value === '1':
-                return 'cell cell_filled'
-                break;
-            default:
-                return 'cell cell_invalid';
-                break;
+    function getCellClass(cell: Cell): string {
+        let cellString = 'cell';
+
+        if (cell.value === '0') {
+            cellString = 'cell cell_empty';
         }
+
+        if (cell.value === '1') {
+            cellString = 'cell cell_filled'
+        }
+
+        if (cell.selected) {
+            cellString += ' cell_selected';
+        }
+
+        return cellString;
     }
 
     return `${_.mapDOM(board.grid, (row) =>
             `<div class="row">
                 ${_.mapDOM(row, (cell) => (
-                    `<div class="${getCellClass(cell)}">${cell.x},${cell.y}</div>`
+                    `<div class="${getCellClass(cell)}" data-x="${cell.x}" data-y="${cell.y}">
+                        ${cell.x},${cell.y}
+                    </div>`
                 ))}
             </div>`
     )}`;
 });
+
+export const renderMyMoveList = (data) => renderMoveList(
+    document.querySelector('.move-list'),
+    data,
+);
 
 export const renderMoveList = render((moveList: Move[]) => {
     return `${_.mapDOM(moveList, (el: Move) => (

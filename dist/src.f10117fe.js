@@ -189,49 +189,7 @@ var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/models/board.ts":[function(require,module,exports) {
-"use strict";
-
-exports.__esModule = true;
-
-var Board =
-/** @class */
-function () {
-  function Board(boardString) {
-    this._grid = [];
-
-    this._parseGrid(boardString);
-  }
-
-  Board.prototype._parseGrid = function (boardString) {
-    this.grid = boardString.split(/\r?\n/).filter(function (el) {
-      return el !== "";
-    }).map(function (row, y) {
-      return row.split('').map(function (cell, x) {
-        return {
-          value: cell,
-          x: x,
-          y: y
-        };
-      });
-    });
-  };
-
-  Object.defineProperty(Board.prototype, "grid", {
-    get: function get() {
-      return this._grid;
-    },
-    set: function set(val) {
-      this._grid = val;
-    },
-    enumerable: true,
-    configurable: true
-  });
-  return Board;
-}();
-
-exports["default"] = Board;
-},{}],"src/util/_dom.ts":[function(require,module,exports) {
+},{"_css_loader":"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/util/_dom.ts":[function(require,module,exports) {
 "use strict";
 
 exports.__esModule = true;
@@ -245,6 +203,20 @@ var mapDOM = function mapDOM(arr, f) {
 
 exports["default"] = {
   mapDOM: mapDOM
+};
+},{}],"src/util/_js.ts":[function(require,module,exports) {
+"use strict";
+
+exports.__esModule = true;
+
+var prop = function prop(_prop) {
+  return function (obj) {
+    return obj[_prop];
+  };
+};
+
+exports["default"] = {
+  prop: prop
 };
 },{}],"src/util/_maybe.ts":[function(require,module,exports) {
 "use strict";
@@ -266,13 +238,34 @@ function () {
     return this._value === null || this._value === undefined;
   };
 
+  Maybe.prototype.get = function (prop) {
+    var _this = this;
+
+    return this.map(function () {
+      return _this._value[prop];
+    });
+  }; // takes "." separated nested props
+
+
+  Maybe.prototype.getPath = function (prop) {
+    var _this = this;
+
+    return Maybe.from(prop.split(".")).map(function (_a) {
+      var first = _a[0],
+          rest = _a.slice(1);
+
+      return rest.length > 0 ? Maybe.from(_this._value[first]).getPath(rest.join(".")).join() : Maybe.from(_this._value).get(first).join();
+    });
+  };
+
   Maybe.prototype.map = function (f) {
-    if (this._value === this.isNothing()) {
+    if (this.isNothing()) {
       return Maybe.from(null);
     }
 
     return Maybe.from(f(this._value));
-  };
+  }; // Unwraps a layer of Maybes
+
 
   Maybe.prototype.join = function () {
     return this._value;
@@ -283,7 +276,7 @@ function () {
   };
 
   Maybe.prototype.orElse = function (fallback) {
-    if (this._value === this.isNothing()) {
+    if (this.isNothing()) {
       return Maybe.from(fallback);
     }
 
@@ -323,58 +316,87 @@ exports.__esModule = true;
 
 var _dom_1 = __importDefault(require("./_dom"));
 
+var _js_1 = __importDefault(require("./_js"));
+
 var _maybe_1 = __importDefault(require("./_maybe"));
 
 exports.Maybe = _maybe_1["default"];
-exports["default"] = __assign({}, _dom_1["default"]);
-},{"./_dom":"src/util/_dom.ts","./_maybe":"src/util/_maybe.ts"}],"src/render/render.ts":[function(require,module,exports) {
+exports["default"] = __assign({}, _dom_1["default"], _js_1["default"]);
+},{"./_dom":"src/util/_dom.ts","./_js":"src/util/_js.ts","./_maybe":"src/util/_maybe.ts"}],"src/models/board.ts":[function(require,module,exports) {
 "use strict";
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
 
 exports.__esModule = true;
 
-var _1 = __importDefault(require("../util/_"));
-
-exports.render = function (template) {
-  return function (container, data) {
-    container.innerHTML = template(data);
-  };
-};
-
-exports.renderBoard = exports.render(function (board) {
-  function getCellClass(cell) {
-    switch (true) {
-      case cell.value === '0':
-        return 'cell cell_empty';
-        break;
-
-      case cell.value === '1':
-        return 'cell cell_filled';
-        break;
-
-      default:
-        return 'cell cell_invalid';
-        break;
+var Board =
+/** @class */
+function () {
+  function Board(boardString) {
+    if (boardString === void 0) {
+      boardString = '';
     }
+
+    this._grid = [];
+
+    this._parseGrid(boardString);
   }
 
-  return "" + _1["default"].mapDOM(board.grid, function (row) {
-    return "<div class=\"row\">\n                " + _1["default"].mapDOM(row, function (cell) {
-      return "<div class=\"" + getCellClass(cell) + "\">" + cell.x + "," + cell.y + "</div>";
-    }) + "\n            </div>";
+  Board.fromGrid = function (grid) {
+    var newBoard = new Board();
+    newBoard.grid = grid;
+    return newBoard;
+  };
+
+  Board.prototype._parseGrid = function (boardString) {
+    this.grid = boardString.split(/\r?\n/).filter(function (el) {
+      return el !== "";
+    }).map(function (row, y) {
+      return row.split('').map(function (cell, x) {
+        return {
+          value: cell,
+          x: x,
+          y: y,
+          selected: false
+        };
+      });
+    });
+  };
+
+  Object.defineProperty(Board.prototype, "grid", {
+    get: function get() {
+      return this._grid;
+    },
+    set: function set(val) {
+      this._grid = val;
+    },
+    enumerable: true,
+    configurable: true
   });
-});
-exports.renderMoveList = exports.render(function (moveList) {
-  return "" + _1["default"].mapDOM(moveList, function (el) {
-    return "<p>(" + el.fromX + "," + el.fromY + ") => (" + el.toX + "," + el.toY + ")</p>";
-  });
-});
-},{"../util/_":"src/util/_.ts"}],"src/models/MoveList.ts":[function(require,module,exports) {
+
+  Board.prototype.getStone = function (x, y) {
+    return this._grid[y][x];
+  };
+
+  Board.prototype.removeStone = function (x, y) {
+    this._grid[y][x].value = "0";
+    return Board.fromGrid(this.grid);
+  };
+
+  Board.prototype.selectStone = function (x, y) {
+    this._grid.forEach(function (row) {
+      return row.forEach(function (stone) {
+        return stone.selected = false;
+      });
+    });
+
+    this.getStone(x, y).selected = true;
+    return Board.fromGrid(this.grid);
+  };
+
+  return Board;
+}();
+
+exports["default"] = Board;
+},{}],"src/models/MoveList.ts":[function(require,module,exports) {
 "use strict";
 
 exports.__esModule = true;
@@ -400,20 +422,99 @@ function () {
   });
 
   MoveList.prototype.addMove = function (m) {
-    this._moves.push(m);
+    return new MoveList(this.moves.concat([m]));
   };
 
   MoveList.prototype.removeMove = function (m) {
-    var newMoves = this.moves.filter(function (el) {
+    return new MoveList(this.moves.filter(function (el) {
       return el !== m;
-    }).slice();
-    return newMoves;
+    }).slice());
+  };
+
+  MoveList.prototype.removeIndex = function (index) {
+    return new MoveList(this.moves.splice(index, 1).slice());
   };
 
   return MoveList;
 }();
 
 exports["default"] = MoveList;
+},{}],"src/render/render.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+exports.__esModule = true;
+
+var _1 = __importDefault(require("../util/_"));
+
+exports.render = function (template) {
+  return function (container, data) {
+    container.innerHTML = template(data);
+  };
+};
+
+exports.renderMyBoard = function (data) {
+  return exports.renderBoard(document.querySelector('.board'), data);
+};
+
+exports.renderBoard = exports.render(function (board) {
+  function getCellClass(cell) {
+    var cellString = 'cell';
+
+    if (cell.value === '0') {
+      cellString = 'cell cell_empty';
+    }
+
+    if (cell.value === '1') {
+      cellString = 'cell cell_filled';
+    }
+
+    if (cell.selected) {
+      cellString += ' cell_selected';
+    }
+
+    return cellString;
+  }
+
+  return "" + _1["default"].mapDOM(board.grid, function (row) {
+    return "<div class=\"row\">\n                " + _1["default"].mapDOM(row, function (cell) {
+      return "<div class=\"" + getCellClass(cell) + "\" data-x=\"" + cell.x + "\" data-y=\"" + cell.y + "\">\n                        " + cell.x + "," + cell.y + "\n                    </div>";
+    }) + "\n            </div>";
+  });
+});
+
+exports.renderMyMoveList = function (data) {
+  return exports.renderMoveList(document.querySelector('.move-list'), data);
+};
+
+exports.renderMoveList = exports.render(function (moveList) {
+  return "" + _1["default"].mapDOM(moveList, function (el) {
+    return "<p>(" + el.fromX + "," + el.fromY + ") => (" + el.toX + "," + el.toY + ")</p>";
+  });
+});
+},{"../util/_":"src/util/_.ts"}],"src/state/State.ts":[function(require,module,exports) {
+"use strict";
+
+exports.__esModule = true;
+var target = {
+  registerRenderFunction: function registerRenderFunction(func) {
+    this.render = func;
+  }
+};
+var stateHandler = {
+  set: function set(state, prop, value) {
+    // console.log(`Setting ${prop} to: `, value);
+    state[prop] = value;
+    state.render();
+    return true;
+  }
+};
+exports["default"] = new Proxy(target, stateHandler);
 },{}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
@@ -427,29 +528,37 @@ exports.__esModule = true;
 
 require("./styles/main.scss");
 
-var board_1 = __importDefault(require("./models/board"));
+var _1 = require("./util/_");
 
-var render_1 = require("./render/render");
+var board_1 = __importDefault(require("./models/board"));
 
 var MoveList_1 = __importDefault(require("./models/MoveList"));
 
-var grid = "\nxxx111xxx\nxxx111xxx\nxxx111xxx\n111111111\n111101111\n111111111\nxxx111xxx\nxxx111xxx\nxxx111xxx\n";
-var state = {
-  gameBoard: new board_1["default"](grid),
-  possibleMoves: new MoveList_1["default"]()
-};
+var render_1 = require("./render/render");
 
-var renderMyBoard = function renderMyBoard(data) {
-  return render_1.renderBoard(document.querySelector('.board'), data);
-};
+var State_1 = __importDefault(require("./state/State"));
 
-var renderMyMoveList = function renderMyMoveList(data) {
-  return render_1.renderMoveList(document.querySelector('.move-list'), data);
-};
+var grid = "\nxxx111xxx\nxxx111xxx\nxx11111xx\n111111111\n111101111\n111111111\nxx11111xx\nxxx111xxx\nxxx111xxx\n";
 
-renderMyBoard(state.gameBoard);
-renderMyMoveList(state.possibleMoves.moves);
-},{"./styles/main.scss":"src/styles/main.scss","./models/board":"src/models/board.ts","./render/render":"src/render/render.ts","./models/MoveList":"src/models/MoveList.ts"}],"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+function renderAllTheThings() {
+  _1.Maybe.from(State_1["default"]).get("gameBoard").map(render_1.renderMyBoard);
+
+  _1.Maybe.from(State_1["default"]).getPath("possibleMoves.moves").map(render_1.renderMyMoveList);
+}
+
+State_1["default"].registerRenderFunction(renderAllTheThings);
+State_1["default"].gameBoard = new board_1["default"](grid);
+State_1["default"].possibleMoves = new MoveList_1["default"]();
+document.querySelector('.board').addEventListener('click', function (event) {
+  var _a = event.target.dataset,
+      x = _a.x,
+      y = _a.y;
+
+  if (x && y) {
+    State_1["default"].gameBoard = State_1["default"].gameBoard.selectStone(x, y);
+  }
+});
+},{"./styles/main.scss":"src/styles/main.scss","./util/_":"src/util/_.ts","./models/board":"src/models/board.ts","./models/MoveList":"src/models/MoveList.ts","./render/render":"src/render/render.ts","./state/State":"src/state/State.ts"}],"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -477,7 +586,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58883" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50347" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

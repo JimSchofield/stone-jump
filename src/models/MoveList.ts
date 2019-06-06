@@ -11,12 +11,15 @@ export default class MoveList {
         return this._moves;
     }
 
-    addMove(m: Move): void {
-        this._moves.push(m);
+    addMove(m: Move): MoveList {
+        return new MoveList([...this.moves, m]);
     }
 
-    removeMove(m: Move): Move[] {
-        const newMoves = [...this.moves.filter(el => el !== m)];
-        return newMoves;
+    removeMove(m: Move): MoveList {
+        return new MoveList([...this.moves.filter(el => el !== m)]);
+    }
+
+    removeIndex(index: number): MoveList {
+        return new MoveList([...this.moves.splice(index,1)])
     }
 }
