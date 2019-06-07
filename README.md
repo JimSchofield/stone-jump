@@ -2,12 +2,11 @@
 
 Designed to be a simulator/solver for stone jumping solitaire-type games.
 
-## Install
-
-I use parcel.  To install, make sure parcel.js is installed globally.  Then run in the root folder:
+## Install and run
 
 ```
-parcel index.html
+npm install
+npm run serve
 ```
 
 ## TODO:
