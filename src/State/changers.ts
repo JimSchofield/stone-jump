@@ -12,6 +12,7 @@ const changeState = (property: string) => (value: any) => {
 const changeBoard = changeState('gameBoard');
 
 export const selectStone = (x: number, y: number) => {
-    if (State.gameBoard.getStone)
-    changeBoard(State.gameBoard.selectStone(x,y));
+    if (State.gameBoard.getStone(x,y).value === "1") {
+        changeBoard(State.gameBoard.selectStone(x,y));
+    }
 }

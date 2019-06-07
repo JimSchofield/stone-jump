@@ -2,13 +2,14 @@ import './styles/main.scss';
 
 import _, { Maybe } from './util/_';
 
+import { BOARD_CONTAINER } from './constants';
+
 import Board from "./models/board";
 import Move from './models/Move';
 import MoveList from './models/MoveList';
 import { renderMyBoard, renderMyMoveList } from './render/render';
 import State from './state/State';
-import { selectStone } from './state/changers';
-import { BOARD_CONTAINER } from './constants';
+import registerHandlers from './ui/handlers';
 
 const grid = `
 xxx111xxx
@@ -36,9 +37,6 @@ State.registerRenderFunction(renderAllTheThings);
 State.gameBoard = new Board(grid);
 State.possibleMoves = new MoveList();
 
-document.querySelector(BOARD_CONTAINER).addEventListener('click', event => {
-    let {x, y} = (event.target as HTMLElement).dataset;
-    if (x && y) {
-        selectStone(+x,+y);
-    }
-})
+registerHandlers();
+
+
