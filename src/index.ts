@@ -10,6 +10,7 @@ import MoveList from './models/MoveList';
 import { renderMyBoard, renderMyMoveList } from './render/render';
 import State from './state/State';
 import registerHandlers from './ui/handlers';
+import { assembleCartesianJumpMoves } from './logic/moveFilters';
 
 const grid = `
 xxx111xxx
@@ -29,7 +30,9 @@ function renderAllTheThings() {
         .map(renderMyBoard);
 
     Maybe.from(State)
-        .getPath("possibleMoves.moves")
+        .get("gameBoard")
+        .map(assembleCartesianJumpMoves)
+        .get('moves')
         .map(renderMyMoveList);
 }
 

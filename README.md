@@ -15,3 +15,6 @@ npm run serve
 - [ ] Create `moveHistory` which will allow tracking of moves and rewinding
 - [ ] Create recursive `findASolution` which finds first possible solution recursively
 - [ ] Create recursive `countAllSolutions`
+
+## WANTTODO
+- [ ] Create a board modifying user interface
