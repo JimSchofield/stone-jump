@@ -2,4 +2,15 @@
     position: fixed;
     bottom: 1em;
     left: 1em;
+    background: white;
+    padding: 8px;
+    border-radius: 4px;
+    list-style: none;
+    font-family: monospace;
+    font-size: 18px;
+}
+
+.selected-move-list {
+    left: auto;
+    right: 1em;
 }

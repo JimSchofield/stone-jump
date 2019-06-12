@@ -4,7 +4,7 @@ import Board, { Cell } from "../models/Board";
 import MoveList from '../models/MoveList';
 import Move from '../models/Move';
 
-import { MOVE_LIST, BOARD_CONTAINER } from '../constants';
+import { MOVE_LIST, BOARD_CONTAINER, SELECTED_MOVE_LIST } from '../constants';
 
 export const render = (template: (data: any) => string): (container: HTMLElement, data:any) => void => {
     return (container: HTMLElement, data: any) => {
@@ -36,9 +36,9 @@ export const renderBoard = render((board: Board) => {
         return cellString;
     }
 
-    return `${_.mapDOM(board.grid, (row) =>
+    return `${_.mapDOM(board.grid, (row: []) =>
             `<div class="row">
-                ${_.mapDOM(row, (cell) => (
+                ${_.mapDOM(row, (cell: Cell) => (
                     `<div class="${getCellClass(cell)}" data-x="${cell.x}" data-y="${cell.y}">
                         ${cell.x},${cell.y}
                     </div>`
@@ -47,13 +47,21 @@ export const renderBoard = render((board: Board) => {
     )}`;
 });
 
+export const renderMoveList = render((moveList: Move[]) => {
+    return moveList.length > 0 ?
+        `${_.mapDOM(moveList, (el: Move) => (
+            `<li class="move-list__item">(${el.from.x},${el.from.y}) => (${el.to.x},${el.to.y})</li>`
+        ))}`
+    :
+        `<li class="move-list__item">No moves</li>`;
+});
+
 export const renderMyMoveList = (data: any) => renderMoveList(
     document.querySelector(MOVE_LIST) as HTMLElement,
     data,
 );
 
-export const renderMoveList = render((moveList: Move[]) => {
-    return `${_.mapDOM(moveList, (el: Move) => (
-        `<p>(${el.fromX},${el.fromY}) => (${el.toX},${el.toY})</p>`
-    ))}`;
-});
+export const renderSelectedMoveList = (data: any) => renderMoveList(
+    document.querySelector(SELECTED_MOVE_LIST) as HTMLElement,
+    data
+);

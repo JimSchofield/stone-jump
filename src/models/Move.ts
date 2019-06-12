@@ -1,9 +1,12 @@
 export default class Move {
     constructor(
-        public fromX: number,
-        public fromY: number,
-        public toX: number,
-        public toY: number,
-    ) {
-}
+        public from: {
+            x: number,
+            y: number,
+        },
+        public to: {
+            x: number,
+            y: number,
+        }
+    ) {}
 }
