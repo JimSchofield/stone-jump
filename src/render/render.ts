@@ -6,7 +6,7 @@ import Move from '../models/Move';
 
 import { MOVE_LIST, BOARD_CONTAINER, SELECTED_MOVE_LIST } from '../constants';
 
-export const render = (template: (data: any) => string): (container: HTMLElement, data:any) => void => {
+export const render = (template: (data: any) => string): (container: HTMLElement, data: any) => void => {
     return (container: HTMLElement, data: any) => {
         container.innerHTML = template(data);
     };
@@ -33,16 +33,20 @@ export const renderBoard = render((board: Board) => {
             cellString += ' cell_selected';
         }
 
+        if (cell.highlighted) {
+            cellString += ' cell_highlighted';
+        }
+
         return cellString;
     }
 
     return `${_.mapDOM(board.grid, (row: []) =>
-            `<div class="row">
+        `<div class="row">
                 ${_.mapDOM(row, (cell: Cell) => (
-                    `<div class="${getCellClass(cell)}" data-x="${cell.x}" data-y="${cell.y}">
+            `<div class="${getCellClass(cell)}" data-x="${cell.x}" data-y="${cell.y}">
                         ${cell.x},${cell.y}
                     </div>`
-                ))}
+        ))}
             </div>`
     )}`;
 });
@@ -52,7 +56,7 @@ export const renderMoveList = render((moveList: Move[]) => {
         `${_.mapDOM(moveList, (el: Move) => (
             `<li class="move-list__item">(${el.from.x},${el.from.y}) => (${el.to.x},${el.to.y})</li>`
         ))}`
-    :
+        :
         `<li class="move-list__item">No moves</li>`;
 });
 

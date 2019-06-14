@@ -2,7 +2,8 @@ export interface Cell {
     value: string;
     x: number;
     y: number;
-    selected: boolean
+    selected: boolean;
+    highlighted: boolean;
 }
 
 export interface Coords {
@@ -12,7 +13,7 @@ export interface Coords {
 
 export default class Board {
     _containerElement: HTMLElement;
-    _grid:  Cell[][] = [];
+    _grid: Cell[][] = [];
 
     constructor(boardString: string = '') {
         this._parseGrid(boardString);
@@ -34,6 +35,7 @@ export default class Board {
                         x,
                         y,
                         selected: false,
+                        highlighted: false,
                     }))
             });
     }
@@ -46,18 +48,27 @@ export default class Board {
         return this._grid;
     }
 
-    getStone(x: number,y: number): Cell {
+    getStone(x: number, y: number): Cell {
         return this._grid[y][x];
     }
 
-    removeStone(x: number,y: number): Board {
+    removeStone(x: number, y: number): Board {
         this._grid[y][x].value = "0";
         return Board.fromGrid(this.grid);
     }
 
     selectStone(x: number, y: number): Board {
-        this._grid.forEach(row => row.forEach(stone => stone.selected= false));
-        this.getStone(x,y).selected = true;
+        this._grid.forEach(row => row.forEach(stone => stone.selected = false));
+        this.getStone(x, y).selected = true;
         return Board.fromGrid(this.grid);
     }
+}
+
+
+export const getSelected = (grid: Cell[][]): Cell => {
+    return grid.flat(2).find(el => el.selected);
+}
+
+export const clearHighlighted = (grid: Cell[][]) => {
+
 }

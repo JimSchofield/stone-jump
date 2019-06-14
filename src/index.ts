@@ -2,14 +2,13 @@ import './styles/main.scss';
 
 import _, { Maybe } from './util/_';
 
-import { BOARD_CONTAINER } from './constants';
-
-import Board, { Cell } from "./models/board";
+import registerHandlers from './ui/handlers';
+import { assembleCartesianJumpMoves, assembleCartesianMovesFromSelected } from './logic/moveFilters';
+import Board, { getSelected } from "./models/board";
 import MoveList from './models/MoveList';
 import { renderMyBoard, renderMyMoveList, renderSelectedMoveList } from './render/render';
 import State from './state/State';
-import registerHandlers from './ui/handlers';
-import { assembleCartesianJumpMoves, assembleCartesianFromSelected } from './logic/moveFilters';
+
 
 const grid = `
 xxx111xxx
@@ -24,23 +23,23 @@ xxx101xxx
 `;
 
 function renderAllTheThings() {
-    Maybe.from(State)
-        .get('gameBoard')
-        .map(renderMyBoard);
-
+    
     Maybe.from(State)
         .get('gameBoard')
         .map(assembleCartesianJumpMoves)
         .get('moves')
         .map(renderMyMoveList);
-
+        
     Maybe.from(State)
         .getPath('gameBoard.grid')
-        .map(board => board.flat().filter((cell: Cell) => cell.selected))
-        .map(list => list.length > 0 ? list[0] : null) 
-        .map(assembleCartesianFromSelected(State.gameBoard))
+        .map(getSelected)
+        .map(assembleCartesianMovesFromSelected(State.gameBoard))
         .get('moves')
         .map(renderSelectedMoveList);
+    
+    Maybe.from(State)
+        .get('gameBoard')
+        .map(renderMyBoard);
 }
 
 State.registerRenderFunction(renderAllTheThings);

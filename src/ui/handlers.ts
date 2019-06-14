@@ -1,4 +1,4 @@
-import { selectStone } from "../state/changers";
+import { selectStone, highlightValidMoves } from "../state/changers";
 import { BOARD_CONTAINER } from "../constants";
 
 interface Handlers {
@@ -11,6 +11,7 @@ const handlers: Handlers = {
             let {x, y} = (event.target as HTMLElement).dataset;
             if (x && y) {
                 selectStone(+x,+y);
+                highlightValidMoves(+x,+y);
             }
         })
     }

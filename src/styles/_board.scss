@@ -41,3 +41,7 @@
     background: lighten($BLUE, 20%);
     color: $BLACK;
 }
+
+.cell_highlighted { 
+    border-color: chartreuse;
+}
