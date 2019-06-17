@@ -23,9 +23,8 @@ export const selectStone = (x: number, y: number) => {
 export const highlightValidMoves = (x: number, y: number): void => {
     //clear board highlights
     Maybe.from(State)
-        .get('gameBoard.grid')
-        .map(console.log)
-        .map(grid => grid.forEach((row: Cell[]) => row.forEach((cell: Cell) => cell.highlighted = false)));
+        .get('gameBoard')
+        .map((board: Board) => board.grid.forEach((row: Cell[]) => row.forEach((cell: Cell) => cell.highlighted = false)));
 
     Maybe.from(State)
         .getPath('gameBoard.grid')
@@ -40,4 +39,24 @@ export const highlightValidMoves = (x: number, y: number): void => {
 
     // Have to rethink this...
     changeBoard(State.gameBoard);
+}
+
+export const doMove = (x: number, y: number): void => {
+    changeBoard(Maybe.from(State)
+        .get('gameBoard')
+        .map((board: Board) => {
+            const {x: fromX, y: fromY } = getSelected(board.grid);
+            board.grid[fromY][fromX].value = "0";
+            board.grid[y][x].value = "1";
+            // remove stone from midpoint
+            board.grid[(fromY + y) / 2][(fromX + x)/2].value = "0";
+
+            return board;
+        })
+        .join()
+    );
+}
+
+export const clearBoard = () => {
+    changeBoard(State.gameBoard.clearStones());
 }

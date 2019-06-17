@@ -18,13 +18,23 @@ const target: State = {
     possibleMovesFromSelected: null,
 }
 
-const stateHandler: ProxyHandler<State> = {
+interface MyProxyHandler extends ProxyHandler<State> {
+    queuedRender: number | null;
+}
+
+const stateHandler: MyProxyHandler = {
     set(state: any, prop: string, value: any): boolean {
         // console.log(`Setting ${prop} to: `, value);
         state[prop] = value;
-        state.render();
+        // if (this.queuedRender === null) {
+        //     this.queuedRender = requestAnimationFrame(() => {
+                state.render();
+        //         this.queuedRender = null;
+        //     });
+        // };
         return true;
-    }
+    },
+    queuedRender: null,  
 }
 
-export default new Proxy(target, stateHandler);
+export default new Proxy(target, stateHandler);  

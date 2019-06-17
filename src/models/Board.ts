@@ -62,13 +62,17 @@ export default class Board {
         this.getStone(x, y).selected = true;
         return Board.fromGrid(this.grid);
     }
+
+    clearStones(): Board {
+        this.grid.forEach(row => row.forEach(cell => {
+            cell.selected = false
+            cell.highlighted = false;
+        }));
+        return Board.fromGrid(this.grid);
+    }
 }
 
 
 export const getSelected = (grid: Cell[][]): Cell => {
     return grid.flat(2).find(el => el.selected);
-}
-
-export const clearHighlighted = (grid: Cell[][]) => {
-
 }

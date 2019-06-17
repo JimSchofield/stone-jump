@@ -11,15 +11,13 @@ import State from './state/State';
 
 
 const grid = `
-xxx111xxx
-xxx111xxx
-xx11111xx
-111111111
-111101111
-111111111
-xx11110xx
-xxx111xxx
-xxx101xxx
+xx111xx
+xx111xx
+1111111
+1110111
+1111111
+xx111xx
+xx111xx
 `;
 
 function renderAllTheThings() {
@@ -45,6 +43,7 @@ function renderAllTheThings() {
 State.registerRenderFunction(renderAllTheThings);
 State.gameBoard = new Board(grid);
 State.possibleMoves = new MoveList();
+State.possibleMovesFromSelected = []
 
 registerHandlers();
 
